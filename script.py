@@ -116,6 +116,26 @@ def blrObjFunction(initialWeights, *args):
     # YOUR CODE HERE #
     ##################
     # HINT: Do not forget to add the bias term to your input data
+    
+    initialWeights = np.reshape(initialWeights, (n_features + 1, 1)) # 716 x 1
+    
+    # add bias in train_data
+    train_data = np.column_stack([np.ones((n_data,1), dtype = np.uint8), train_data]) # 50000 x 716 
+    
+    z = np.dot(train_data,initialWeights) # 50000 x 1
+    
+    theta = sigmoid(z) # 50000 x 1
+      
+    prod1 = np.dot(labeli.T, np.log(theta))
+    prod2 = np.dot((1 - labeli).T, np.log(1 - theta))
+    prod = np.add(prod1, prod2)
+    
+    error = (-1/n_data) * np.sum(prod)
+    print(error)
+    
+    error_grad = np.dot(train_data.T,np.subtract(theta, labeli))
+    error_grad = (1/n_data) * error_grad
+    error_grad = error_grad.flatten()
 
     return error, error_grad
 
@@ -141,6 +161,18 @@ def blrPredict(W, data):
     # YOUR CODE HERE #
     ##################
     # HINT: Do not forget to add the bias term to your input data
+    
+    m = data.shape[0] # number of training data
+    
+    # add bias in train_data
+    data = np.column_stack([np.ones((m,1), dtype = np.uint8), data]) # 50000 x 716 
+    
+    z = np.dot(data,W) # 50000 x 10
+    
+    theta = sigmoid(z) # 50000 x 10
+    
+    label = np.argmax(theta, axis = 1)
+    label = np.reshape(label, (data.shape[0], 1))
 
     return label
 
