@@ -3,6 +3,8 @@ from scipy.io import loadmat
 from scipy.optimize import minimize
 from sklearn import svm
 import matplotlib.pyplot as plt
+from sklearn import svm
+import datetime
 
 
 def preprocess():
@@ -280,6 +282,103 @@ print('\n\n--------------SVM-------------------\n\n')
 ##################
 # YOUR CODE HERE #
 ##################
+
+np.random.seed = 100
+
+X_train = []
+y_train = []
+for i in range(10):
+    x = train_data[np.where(train_label == i)[0]]
+    np.random.shuffle(x)
+    X_train.extend(x[:1000])
+    y_train.extend([i] * 1000)
+X_train = np.asarray(X_train)
+y_train = np.asarray(y_train)
+
+randomize = np.arange(10000)
+np.random.shuffle(randomize)
+X_train = X_train[randomize]
+y_train = y_train[randomize]
+
+start = datetime.datetime.now()
+svm_fit1 = svm.LinearSVC().fit(X_train, y_train)
+end = datetime.datetime.now()
+diff = end - start
+print("total time taken =", diff.total_seconds())
+accuracy1 = svm_fit1.score(X_train, y_train)
+accuracy2 = svm_fit1.score(validation_data, validation_label)
+accuracy3 = svm_fit1.score(test_data, test_label)
+print('SVM Linear Accuracy on training data', accuracy1) #0.9632
+print('SVM Linear Accuracy on validation data', accuracy2) #0.8888
+print('SVM Linear Accuracy on testing data', accuracy3) #0.8934
+
+start = datetime.datetime.now()
+svm_fit2 = svm.SVC(kernel='rbf').fit(X_train, y_train)
+end = datetime.datetime.now()
+diff = end - start
+print("total time taken =", diff.total_seconds())
+accuracy1 = svm_fit2.score(X_train, y_train)
+print('SVM Default RBF Accuracy on train data', accuracy1) #9245
+accuracy2 = svm_fit2.score(validation_data, validation_label) 
+print('SVM Default RBF Accuracy on validation data', accuracy2) # 0.9191
+accuracy3 = svm_fit2.score(test_data, test_label)
+print('SVM Default RBF Accuracy on test data', accuracy3) #9241
+
+start = datetime.datetime.now()
+svm_fit3 = svm.SVC(kernel='rbf', gamma=1).fit(X_train, y_train)
+end = datetime.datetime.now()
+diff = end - start
+print("total time taken =", diff.total_seconds())
+accuracy1 = svm_fit3.score(X_train, y_train)
+accuracy2 = svm_fit3.score(validation_data, validation_label)
+accuracy3 = svm_fit3.score(test_data, test_label)
+print('SVM RBF gamma 1 Accuracy on training data', accuracy1) #1.0
+print('SVM RBF gamma 1 Accuracy on validation data', accuracy2) # 0.1763
+print('SVM RBF gamma 1 Accuracy on test data', accuracy3) #0.1848
+
+c = [1, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100]
+acc_train = []
+acc_val = []
+acc_test = []
+time = []
+for C in c:
+    start = datetime.datetime.now()
+    svm_fit4 = svm.SVC(kernel='rbf', C=C).fit(X_train, y_train)
+    end = datetime.datetime.now()
+    diff = end - start
+    print("\n total time taken =", diff.total_seconds())
+    time.append(diff.total_seconds())
+    acc_tr = svm_fit4.score(X_train, y_train)
+    acc_train.append(acc_tr)
+    acc_v = svm_fit4.score(validation_data, validation_label)
+    acc_val.append(acc_v)
+    acc_te = svm_fit4.score(test_data, test_label)
+    acc_test.append(acc_te)
+
+#print("Training accuracies : ", acc_train) #[0.9245, 0.9633, 0.977, 0.9836, 0.9886, 0.992, 0.9933, 0.9955, 0.9966, 0.9974, 0.998]
+#print("Validation accuracies : ", acc_val) #[0.9191, 0.9419, 0.9461, 0.9462, 0.9459, 0.9457, 0.9465, 0.9475, 0.9465, 0.9465, 0.9452]
+#print("Testing accuracies : ", acc_test) #[0.9241, 0.9444, 0.9463, 0.9471, 0.9477, 0.9474, 0.9479, 0.9479, 0.9481, 0.9476, 0.9469]
+#print("Time taken : ", time) #[32.657474, 17.101036, 15.017569, 14.398448, 14.234215, 14.103541, 14.143062, 14.267995, 14.067935, 14.061249, 14.152245]
+    
+fig = plt.figure(figsize=(12, 9), dpi= 80)
+ax = plt.axes()
+ax.plot(c, acc_train, label='Training Data')
+ax.plot(c, acc_test, label='Test Data')
+ax.plot(c, acc_val, label='Validation Data')
+plt.grid(alpha=0.3)
+plt.xticks(fontsize=12)
+plt.yticks(fontsize=12)
+plt.xlabel('C', fontsize=16)
+plt.ylabel('Accuracy', fontsize=16)
+ax2 = ax.twinx()
+ax2.plot(c, time, label='Time Taken', color='k')
+ax.legend(loc='center right', ncol=3, fancybox=True)
+ax2.legend(loc='lower right', ncol=1, fancybox=True)
+plt.title('Accuracy vs C', fontsize=20)
+plt.yticks(fontsize=12)
+plt.ylabel('Time Taken (secs)', fontsize=16)
+plt.axvspan(60, 70, color='lightblue', alpha=0.3)
+plt.show()
 
 
 """

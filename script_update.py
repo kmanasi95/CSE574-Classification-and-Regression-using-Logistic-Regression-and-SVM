@@ -4,7 +4,6 @@ from scipy.optimize import minimize
 from sklearn import svm
 import matplotlib.pyplot as plt
 
-
 def preprocess():
     """ 
      Input:
@@ -326,7 +325,6 @@ print('\n\n--------------SVM-------------------\n\n')
 ##################
 # YOUR CODE HERE #
 ##################
-
 
 """
 Script for Extra Credit Part
