@@ -204,7 +204,38 @@ def mlrObjFunction(params, *args):
     # YOUR CODE HERE #
     ##################
     # HINT: Do not forget to add the bias term to your input data
+    
+    ones_bias = np.ones((n_data, 1))
 
+    train_data = np.concatenate((ones_bias, train_data), axis=1) #50000 x 716
+
+    # reshaping
+    W = params.reshape(n_feature + 1, n_class) #716 x 10
+
+    #theta matrix
+    theta = np.zeros((n_data, n_class))
+
+    dot_product_W_X = np.dot(train_data, W) #50000 x 10
+
+    theta_matrix_sum = np.sum(np.exp(dot_product_W_X), axis=1).reshape(n_data, 1) #50000 x 10
+
+    theta_matrix = (np.exp(dot_product_W_X) / theta_matrix_sum) #50000 x 10
+
+    # log
+    log_theta_matrix = np.log(theta_matrix) #50000 x 10
+
+    # The likelihood function with the negative logarithm Equation(7)
+    error = (-1) * np.sum(np.sum(labeli * log_theta_matrix))
+
+    #gradient descent calculation
+    subtract_theta_y = theta_matrix - labeli
+
+    error_grad = (np.dot(train_data.T, subtract_theta_y))
+
+    error = error / n_data
+    error_grad = error_grad / n_data
+    
+    error_grad = error_grad.flatten()
 
     return error, error_grad
 
@@ -230,6 +261,21 @@ def mlrPredict(W, data):
     # YOUR CODE HERE #
     ##################
     # HINT: Do not forget to add the bias term to your input data
+    
+    ones_bias = np.ones((data.shape[0], 1))
+    train_data = np.concatenate((ones_bias, data), axis=1)
+
+
+    dot_product_W_X = np.dot(train_data, W)
+
+
+    theta_matrix_sum = np.sum(np.exp(dot_product_W_X))
+
+    posterior = np.exp(dot_product_W_X) / theta_matrix_sum
+
+    for i in range(posterior.shape[0]):
+        label[i] = np.argmax(posterior[i])
+    label = label.reshape(label.shape[0], 1)
 
     return label
 
